@@ -1,0 +1,9 @@
+{
+  "planterMenuTitle": "Choose the hot wire:",
+  "defuserMenuTitle": "Test your luck and cut a wire:",
+  "wireChosen": " {magenta}>> {default}You chose the {wire}{default} wire. The terrorists can defuse the bomb instantly if they cut it. Psssssht, don't tell them!",
+  "randomWireChosen": " {magenta}>> {default}Since you didn't choose a wire, the {wire}{default} wire was randomly chosen to insta-defuse the bomb.",
+  "cutWrongWire": " {magenta}[Lucky Defuse] {default}Well... Player {lime}{player}{default} cut the {wire}{default} wire, which was wrong.",
+  "cutCorrectWire": " {magenta}[Lucky Defuse] {default}Pheeeew! Player {lime}{player}{default} cut the {wire}{default} wire and saved the day.",
+  "notification": " {magenta}[Lucky Defuse] {default}The bomb's ticking! Be heroic and try to cut a wire - if you choose right, you defuse the bomb instantly!"
+}
