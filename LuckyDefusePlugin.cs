@@ -80,7 +80,7 @@ public class LuckyDefusePlugin : BasePlugin, IPluginConfig<PluginConfig>
             AddTimer(Config.PlanterMenuDuration, () =>
             {
                 _planterMenu.Close();
-                if (_wireChosenManually) return;
+                if (_wireChosenManually || _planter == null) return;
                 _planter.PrintToChat(Localizer["randomWireChosen"].Value.Replace("{wire}", $"{_chatColors[_wire]}{_colors[_wire].Name.ToLower()}"));
             }, TimerFlags.STOP_ON_MAPCHANGE);
             return HookResult.Continue;
