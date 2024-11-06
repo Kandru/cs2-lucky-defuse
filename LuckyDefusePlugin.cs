@@ -36,8 +36,8 @@ public class LuckyDefusePlugin : BasePlugin, IPluginConfig<PluginConfig>
     ];
     private CCSPlayerController? _defuser;
     private CCSPlayerController? _planter;
-    private readonly CenterHtmlMenu _planterMenu;
-    private readonly CenterHtmlMenu _defuserMenu;
+    private readonly WireMenu _planterMenu;
+    private readonly WireMenu _defuserMenu;
     private int _wire;
     private bool _wireChosenManually = false;
 

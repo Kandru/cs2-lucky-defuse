@@ -3,7 +3,7 @@ using CounterStrikeSharp.API.Core;
 
 namespace LuckyDefusePlugin;
 
-public class CenterHtmlMenu(BasePlugin plugin, string title, string[] options)
+public class WireMenu(BasePlugin plugin, string title, string[] options)
 {
     public delegate void OptionConfirmedEventHandler(int option);
     public event OptionConfirmedEventHandler OnOptionConfirmed = delegate {};
