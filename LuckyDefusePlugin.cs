@@ -22,7 +22,7 @@ public class LuckyDefusePlugin : BasePlugin, IPluginConfig<PluginConfig>
 {
     public override string ModuleName => "Lucky Defuse Plugin";
     public override string ModuleAuthor => "Jon-Mailes Graeffe <mail@jonni.it>";
-    public override string ModuleVersion => "1.0.0";
+    public override string ModuleVersion => "1.0.1";
 
     public PluginConfig Config { get; set; } = null!;
 
@@ -39,13 +39,14 @@ public class LuckyDefusePlugin : BasePlugin, IPluginConfig<PluginConfig>
     private readonly CenterHtmlMenu _planterMenu;
     private readonly CenterHtmlMenu _defuserMenu;
     private int _wire;
+    private bool _wireChosenManually = false;
 
     public LuckyDefusePlugin()
     {
         var options = new string[_colors.Length];
         for (int i = 0; i < _colors.Length; ++i)
         {
-            options[i] = $"<span color=\"{_colors[i].Name.ToLower()}\">{_colors[i].Name}</span>";
+            options[i] = $"<span color=\"{_colors[i].Name.ToLower()}\">{i+1}. {_colors[i].Name}</span>";
         }
         
         _planterMenu = new(this, "Choose the hot wire:", options);
@@ -60,15 +61,28 @@ public class LuckyDefusePlugin : BasePlugin, IPluginConfig<PluginConfig>
     
     public override void Load(bool hotReload)
     {
+        RegisterEventHandler<EventRoundEnd>((_, _) =>
+        {
+            _planter = null;
+            _wireChosenManually = false;
+            _defuserMenu.Close();
+            _planterMenu.Close();
+            return HookResult.Continue;
+        });
+        
         RegisterEventHandler<EventBombPlanted>((@event, _) =>
         {
             if (@event.Userid == null) return HookResult.Continue;
-            _wire = -1;
+            _wire = Random.Shared.Next(_colors.Length - 1);
             _planter = @event.Userid;
             _planterMenu.Open(@event.Userid);
-            AddTimer(Config.PlanterMenuDuration, ChooseRandomWire, TimerFlags.STOP_ON_MAPCHANGE);
-            AddTimer(Config.NotificationDelay, () => Server.PrintToChatAll(Localizer["notification"]),
-                TimerFlags.STOP_ON_MAPCHANGE);
+            AddTimer(Config.NotificationDelay, Notify, TimerFlags.STOP_ON_MAPCHANGE);
+            AddTimer(Config.PlanterMenuDuration, () =>
+            {
+                _planterMenu.Close();
+                if (_wireChosenManually) return;
+                _planter.PrintToChat(Localizer["randomWireChosen"].Value.Replace("{wire}", $"{_chatColors[_wire]}{_colors[_wire].Name.ToLower()}"));
+            }, TimerFlags.STOP_ON_MAPCHANGE);
             return HookResult.Continue;
         });
         
@@ -89,6 +103,7 @@ public class LuckyDefusePlugin : BasePlugin, IPluginConfig<PluginConfig>
         
         RegisterEventHandler<EventBombExploded>((_, _) =>
         {
+            _planter = null;
             _defuserMenu.Close();
             _planterMenu.Close();
             return HookResult.Continue;
@@ -96,6 +111,7 @@ public class LuckyDefusePlugin : BasePlugin, IPluginConfig<PluginConfig>
         
         RegisterEventHandler<EventBombDefused>((_, _) =>
         {
+            _planter = null;
             _defuserMenu.Close();
             _planterMenu.Close();
             return HookResult.Continue;
@@ -104,20 +120,57 @@ public class LuckyDefusePlugin : BasePlugin, IPluginConfig<PluginConfig>
         _planterMenu.OnOptionConfirmed += option =>
         {
             _wire = option;
+            _wireChosenManually = true;
             _planter!.PrintToChat(Localizer["wireChosen"].Value.Replace("{wire}", $"{_chatColors[option]}{_colors[option].Name.ToLower()}"));
         };
         _defuserMenu.OnOptionConfirmed += CutWire;
+        
+        AddCommand("ld_choose_wire", "Nominates a map so that it appears in the map vote after the match ends", (player, info) =>
+        {
+            if (player == null)
+            {
+                Server.PrintToConsole("consoleNotAllowed");
+                return;
+            }
+            if (info.ArgCount < 2)
+            {
+                info.ReplyToCommand(Localizer["missingArgument"]);
+                return;
+            }
+
+            if (!int.TryParse(info.GetArg(1), out var option) || option <= 0 || option > _colors.Length)
+            {
+                info.ReplyToCommand(Localizer["malformedArgument"]);
+                return;
+            }
+
+            --option;
+
+            if (_defuser != null && player.AuthorizedSteamID == _defuser.AuthorizedSteamID)
+            {
+                CutWire(option);
+            }
+            else if (_planter != null && player.AuthorizedSteamID == _planter.AuthorizedSteamID)
+            {
+                _wire = option;
+                _wireChosenManually = true;
+                info.ReplyToCommand(Localizer["wireChosen"].Value.Replace("{wire}", $"{_chatColors[option]}{_colors[option].Name.ToLower()}"));
+                _planterMenu.Close();
+            }
+            else
+            {
+                info.ReplyToCommand(Localizer["noBomb"]);
+            }
+        });
         
         _planterMenu.Load();
         _defuserMenu.Load();
     }
 
-    private void ChooseRandomWire()
+    private void Notify()
     {
-        if (_wire >= 0) return;
-        _planterMenu.Close();
-        _wire = Random.Shared.Next(_colors.Length - 1);
-        Server.PrintToChatAll(Localizer["randomWireChosen"].Value.Replace("{wire}", $"{_chatColors[_wire]}{_colors[_wire].Name.ToLower()}"));
+        if (_planter == null) return;
+        Server.PrintToChatAll(Localizer["notification"]);
     }
     
     private void CutWire(int wire)

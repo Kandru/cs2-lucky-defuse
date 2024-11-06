@@ -5,5 +5,8 @@
   "randomWireChosen": " {magenta}>> {default}Since you didn't choose a wire, the {wire}{default} wire was randomly chosen to insta-defuse the bomb.",
   "cutWrongWire": " {magenta}[Lucky Defuse] {default}Well... Player {lime}{player}{default} cut the {wire}{default} wire, which was wrong.",
   "cutCorrectWire": " {magenta}[Lucky Defuse] {default}Pheeeew! Player {lime}{player}{default} cut the {wire}{default} wire and saved the day.",
-  "notification": " {magenta}[Lucky Defuse] {default}The bomb's ticking! Be heroic and try to cut a wire - if you choose right, you defuse the bomb instantly!"
+  "notification": " {magenta}[Lucky Defuse] {default}The bomb's ticking! Be heroic and try to cut a wire - if you choose right, you defuse the bomb instantly!",
+  "missingArgument": "[Lucky Defuse] You need to specify the number of the wire as an argument!",
+  "malformedArgument": "[Lucky Defuse] The first argument needs to be the number of the wire you want to choose from 0 to 3!",
+  "noBomb": " {magenta}[Lucky Defuse]  {default}There is no bomb. Wait for the bomb to be planted if you're T, and the bomb to be defused if you're CT."
 }
