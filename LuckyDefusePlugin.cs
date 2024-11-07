@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text.Json.Serialization;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Core.Capabilities;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
@@ -39,7 +40,8 @@ public class LuckyDefusePlugin : BasePlugin, IPluginConfig<PluginConfig>
     private readonly WireMenu _planterMenu;
     private readonly WireMenu _defuserMenu;
     private int _wire;
-    private bool _wireChosenManually = false;
+    private bool _wireChosenManually;
+    private bool _roundEnded;
 
     public LuckyDefusePlugin()
     {
@@ -61,10 +63,17 @@ public class LuckyDefusePlugin : BasePlugin, IPluginConfig<PluginConfig>
     
     public override void Load(bool hotReload)
     {
+        RegisterEventHandler<EventRoundStart>((_, _) =>
+        {
+            _roundEnded = false;
+            return HookResult.Continue;
+        });
+        
         RegisterEventHandler<EventRoundEnd>((_, _) =>
         {
             _planter = null;
             _wireChosenManually = false;
+            _roundEnded = true;
             _defuserMenu.Close();
             _planterMenu.Close();
             return HookResult.Continue;
@@ -72,7 +81,7 @@ public class LuckyDefusePlugin : BasePlugin, IPluginConfig<PluginConfig>
         
         RegisterEventHandler<EventBombPlanted>((@event, _) =>
         {
-            if (@event.Userid == null) return HookResult.Continue;
+            if (_roundEnded || @event.Userid == null) return HookResult.Continue;
             _wire = Random.Shared.Next(_colors.Length - 1);
             _planter = @event.Userid;
             _planterMenu.Open(@event.Userid);
