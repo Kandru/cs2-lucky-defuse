@@ -1,7 +1,7 @@
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 
-namespace LuckyDefusePlugin;
+namespace LuckyDefuse;
 
 public class WireMenu(BasePlugin plugin, string title, string[] options)
 {

@@ -8,7 +8,7 @@ using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
 
-namespace LuckyDefusePlugin;
+namespace LuckyDefuse;
 
 public class PluginConfig : BasePluginConfig
 {
@@ -19,11 +19,10 @@ public class PluginConfig : BasePluginConfig
     public int NotificationDelay { get; set; } = 30;
 }
 
-public class LuckyDefusePlugin : BasePlugin, IPluginConfig<PluginConfig>
+public partial class LuckyDefuse : BasePlugin, IPluginConfig<PluginConfig>
 {
     public override string ModuleName => "Lucky Defuse Plugin";
     public override string ModuleAuthor => "Jon-Mailes Graeffe <mail@jonni.it>";
-    public override string ModuleVersion => "1.0.1";
 
     public PluginConfig Config { get; set; } = null!;
 
@@ -43,7 +42,7 @@ public class LuckyDefusePlugin : BasePlugin, IPluginConfig<PluginConfig>
     private bool _wireChosenManually;
     private bool _roundEnded;
 
-    public LuckyDefusePlugin()
+    public LuckyDefuse()
     {
         var options = new string[_colors.Length];
         for (int i = 0; i < _colors.Length; ++i)
