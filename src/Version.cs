@@ -1,6 +1,7 @@
-﻿namespace LuckyDefuse;
-
-public partial class LuckyDefuse
+﻿namespace LuckyDefuse
 {
-    public override string ModuleVersion => "1.0.1";
+    public partial class LuckyDefuse
+    {
+        public override string ModuleVersion => "1.0.2";
+    }
 }
